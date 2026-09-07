@@ -92,11 +92,11 @@ export default function Certificates() {
               <HiOutlineAcademicCap className="mx-auto text-5xl text-accent" />
 
               <h3 className="mt-5 font-display text-xl font-semibold text-text">
-                Don’t take my word for it?
+                Sounds fake? 
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-muted">
-                Fair enough. Here’s the actual proof.
+                Unfortunately, it’s real.
               </p>
 
               <button

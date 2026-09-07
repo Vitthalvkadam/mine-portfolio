@@ -129,7 +129,7 @@ export const certificates = [
   {
     title: "Java Programming",
     issuer: "Infosys Springboard",
-    date: "2025",
+    date: "2026",
     image: "/certificates/java_SpringBoot.pdf",
   },
 

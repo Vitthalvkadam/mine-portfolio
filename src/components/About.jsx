@@ -43,22 +43,7 @@ export default function About() {
         <p className="mt-5 leading-relaxed text-muted">{profile.about}</p>
       </motion.div>
 
-      {/* stats */}
-      <div className="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-6 sm:grid-cols-4">
-        {stats.map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
-            className="glass rounded-2xl px-4 py-6 text-center"
-          >
-            <Counter value={s.value} suffix={s.suffix} />
-            <p className="mt-2 font-mono text-xs uppercase tracking-wide text-muted">{s.label}</p>
-          </motion.div>
-        ))}
-      </div>
+    
 
       {/* timeline */}
       <div className="mx-auto mt-24 max-w-2xl">

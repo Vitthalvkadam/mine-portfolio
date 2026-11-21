@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { HiOutlineArrowLeft, HiOutlineArrowTopRightOnSquare } from "react-icons/hi2";
 import { FaGithub } from "react-icons/fa";
 import { projects } from "../data/portfolioData";
+import { hasLink } from "../utils/links.js";
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
@@ -25,7 +26,7 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <section className="container-px mx-auto max-w-4xl py-32">
+    <section className="container-px mx-auto max-w-3xl py-32">
       <Link
         to="/projects"
         className="mb-10 inline-flex items-center gap-1.5 font-mono text-sm text-muted transition-colors hover:text-accent"
@@ -39,35 +40,35 @@ export default function ProjectDetailPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <span className="eyebrow">Case Study</span>
-        <h1 className="section-heading mt-3">{project.title}</h1>
+        <h1 className="section-heading">{project.title}</h1>
 
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="mt-6 flex flex-wrap gap-2" aria-label="Tech stack">
           {project.stack.map((tech) => (
             <span
               key={tech}
-              className="rounded-full border border-border px-3 py-1 font-mono text-[11px] text-accent-2"
+              className="tag"
             >
               {tech}
             </span>
           ))}
         </div>
 
-        <div className="glass mt-8 flex h-56 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface-2">
-          <span className="font-display text-3xl font-semibold text-muted/40">{project.title}</span>
-        </div>
 
-        <p className="mt-8 max-w-2xl leading-relaxed text-muted">{project.description}</p>
+        <p className="mt-8 max-w-prose leading-relaxed text-muted">{project.description}</p>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
-          <a href={project.liveUrl} target="_blank" rel="noreferrer" className="btn-primary">
-            <HiOutlineArrowTopRightOnSquare />
-            Live Demo
-          </a>
-          <a href={project.githubUrl} target="_blank" rel="noreferrer" className="btn-ghost">
-            <FaGithub />
-            View Source
-          </a>
+          {hasLink(project.liveUrl) && (
+            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+              <HiOutlineArrowTopRightOnSquare aria-hidden="true" />
+              Live demo
+            </a>
+          )}
+          {hasLink(project.githubUrl) && (
+            <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost">
+              <FaGithub aria-hidden="true" />
+              View source
+            </a>
+          )}
         </div>
       </motion.div>
     </section>

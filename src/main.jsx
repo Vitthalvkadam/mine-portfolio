@@ -4,13 +4,16 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
+import { CrazyModeProvider } from "./context/CrazyModeContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <CrazyModeProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </CrazyModeProvider>
     </ThemeProvider>
   </StrictMode>
 );

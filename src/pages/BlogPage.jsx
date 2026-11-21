@@ -29,9 +29,8 @@ export default function BlogPage() {
         transition={{ duration: 0.6 }}
         className="mx-auto max-w-2xl text-center"
       >
-        <span className="eyebrow">Blog</span>
-        <h2 className="section-heading mt-3">
-          Notes & <span className="gradient-text">write-ups</span>
+        <h2 className="section-heading">
+          Notes & write-ups
         </h2>
         <p className="mt-5 leading-relaxed text-muted">
           Thoughts on Java, Spring Boot, React, and whatever I'm learning along the way.
@@ -49,7 +48,7 @@ export default function BlogPage() {
           >
             <Link
               to={`/blog/${post.id}`}
-              className="glass group flex flex-col gap-3 rounded-2xl p-7 transition-shadow duration-300 hover:shadow-[0_0_50px_-15px_rgba(255,255,255,0.15)]"
+              className="card group flex flex-col gap-3 p-7"
             >
               <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-muted">
                 <span>{formatDate(post.date)}</span>
@@ -65,7 +64,7 @@ export default function BlogPage() {
                   {post.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full border border-border px-3 py-1 font-mono text-[11px] text-accent-2"
+                      className="tag"
                     >
                       {tag}
                     </span>

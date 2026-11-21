@@ -1,184 +1,202 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { HiOutlineMail, HiOutlineLocationMarker, HiOutlinePaperAirplane } from "react-icons/hi";
+import { useRef, useState } from "react";
+import { HiOutlineMail, HiOutlineLocationMarker } from "react-icons/hi";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import Section from "./Section.jsx";
 import { profile, socials } from "../data/portfolioData";
 
-// 1. Sign up free at https://formspree.io using vitthalvkadam@gmail.com
-// 2. Create a form, verify the email link Formspree sends you
-// 3. Copy the ID from your endpoint (https://formspree.io/f/THIS_PART)
-//    and paste it below.
-const FORM_ENDPOINT = "https://formspree.io/f/xykrjowj";
+// Public Formspree form ID (not a secret). Override per environment with VITE_FORM_ENDPOINT.
+const FORM_ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT || "https://formspree.io/f/xykrjowj";
 
-const infoCards = [
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function validate({ name, email, message }) {
+  const errors = {};
+  if (name.trim().length < 2) errors.name = "Enter your name (at least 2 characters).";
+  if (!EMAIL_RE.test(email.trim())) errors.email = "Enter a valid email address, like you@example.com.";
+  if (message.trim().length < 10) errors.message = "Write at least 10 characters so I know how to help.";
+  else if (message.length > 2000) errors.message = "Keep the message under 2000 characters.";
+  return errors;
+}
+
+const infoRows = [
   { icon: HiOutlineMail, label: "Email", value: profile.email, href: socials.email },
-  { icon: FaGithub, label: "GitHub", value: "@Vitthalvkadam", href: socials.github },
+  { icon: FaGithub, label: "GitHub", value: `@${profile.githubUsername}`, href: socials.github },
   { icon: FaLinkedin, label: "LinkedIn", value: "/in/Vitthalvkadam", href: socials.linkedin },
   { icon: HiOutlineLocationMarker, label: "Location", value: profile.location, href: null },
 ];
 
+const fieldClass = (invalid) =>
+  `w-full rounded-lg border bg-surface-2 px-4 py-2.5 text-sm text-text outline-none transition-colors placeholder:text-muted/60 focus:border-accent ${
+    invalid ? "border-red-400" : "border-border"
+  }`;
+
+function Field({ id, label, error, children }) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-text">
+        {label}
+      </label>
+      {children}
+      {error && (
+        <p id={`${id}-error`} className="mt-1.5 text-xs text-red-400">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [touched, setTouched] = useState({});
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const formRef = useRef(null);
+
+  const errors = validate(form);
+  const shown = (field) => (touched[field] ? errors[field] : undefined);
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    if (status === "sent" || status === "error") setStatus("idle");
   };
+  const handleBlur = (e) => setTouched((t) => ({ ...t, [e.target.name]: true }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("sending");
+    setTouched({ name: true, email: true, message: true });
 
+    const firstInvalid = Object.keys(errors)[0];
+    if (firstInvalid) {
+      formRef.current?.elements[firstInvalid]?.focus();
+      return;
+    }
+
+    setStatus("sending");
     try {
       const response = await fetch(FORM_ENDPOINT, {
         method: "POST",
-        headers: { Accept: "application/json" },
-        body: JSON.stringify(form),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          message: form.message.trim(),
+          _gotcha: formRef.current?.elements._gotcha?.value || "", // honeypot
+        }),
       });
-
-      if (!response.ok) throw new Error("Request failed");
-
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
       setStatus("sent");
       setForm({ name: "", email: "", message: "" });
-      setTimeout(() => setStatus("idle"), 4000);
-    } catch (err) {
+      setTouched({});
+    } catch {
       setStatus("error");
-      setTimeout(() => setStatus("idle"), 4000);
     }
   };
 
   return (
-    <section id="contact" className="container-px mx-auto max-w-7xl py-28">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-        className="mx-auto max-w-2xl text-center"
-      >
-        <span className="eyebrow">Contact</span>
-        <h2 className="section-heading mt-3">
-          Let's build something <span className="gradient-text">together</span>
-        </h2>
-        <p className="mt-5 leading-relaxed text-muted">
-          Open to full-stack roles and collaborations. Reach out and I'll get back to you soon.
-        </p>
-      </motion.div>
-
-      <div className="mt-16 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        {/* info cards */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
-          className="grid content-start gap-4 sm:grid-cols-2 lg:grid-cols-1"
-        >
-          {infoCards.map((card) => {
-            const Icon = card.icon;
-            const content = (
-              <div className="glass flex items-center gap-4 rounded-2xl p-5 transition-colors duration-300 hover:border-accent/40">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xl text-accent">
-                  <Icon />
-                </span>
-                <div>
-                  <p className="font-mono text-[11px] uppercase tracking-wide text-muted">
-                    {card.label}
-                  </p>
-                  <p className="text-sm text-text">{card.value}</p>
-                </div>
-              </div>
+    <Section
+      id="contact"
+      title="Contact"
+      description="Open to full-stack roles and collaborations. Send a message and I'll get back to you."
+    >
+      <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
+        <ul className="divide-y divide-border self-start border-y border-border">
+          {infoRows.map(({ icon: Icon, label, value, href }) => {
+            const inner = (
+              <>
+                <Icon className="shrink-0 text-lg text-accent" aria-hidden="true" />
+                <span className="w-20 shrink-0 text-sm text-muted">{label}</span>
+                <span className="min-w-0 break-words text-sm text-text">{value}</span>
+              </>
             );
-            return card.href ? (
-              <a key={card.label} href={card.href} target="_blank" rel="noreferrer">
-                {content}
-              </a>
-            ) : (
-              <div key={card.label}>{content}</div>
+            return (
+              <li key={label}>
+                {href ? (
+                  <a
+                    href={href}
+                    target={href.startsWith("mailto:") ? undefined : "_blank"}
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 py-4 transition-colors hover:text-accent"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-3 py-4">{inner}</div>
+                )}
+              </li>
             );
           })}
-        </motion.div>
+        </ul>
 
-        {/* form */}
-        <motion.form
-          initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
-          onSubmit={handleSubmit}
-          className="glass rounded-2xl p-7 sm:p-8"
-        >
+        <form ref={formRef} onSubmit={handleSubmit} noValidate className="card p-6 sm:p-7">
           <div className="grid gap-5 sm:grid-cols-2">
-            <div className="sm:col-span-1">
-              <label className="mb-1.5 block font-mono text-xs uppercase tracking-wide text-muted">
-                Name
-              </label>
+            <Field id="name" label="Name" error={shown("name")}>
               <input
-                required
+                id="name"
                 name="name"
+                autoComplete="name"
                 value={form.name}
                 onChange={handleChange}
+                onBlur={handleBlur}
+                aria-invalid={Boolean(shown("name"))}
+                aria-describedby={shown("name") ? "name-error" : undefined}
+                className={fieldClass(shown("name"))}
                 placeholder="Your name"
-                className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm text-text outline-none transition-colors focus:border-accent"
               />
-            </div>
-            <div className="sm:col-span-1">
-              <label className="mb-1.5 block font-mono text-xs uppercase tracking-wide text-muted">
-                Email
-              </label>
+            </Field>
+            <Field id="email" label="Email" error={shown("email")}>
               <input
-                required
-                type="email"
+                id="email"
                 name="email"
+                type="email"
+                autoComplete="email"
                 value={form.email}
                 onChange={handleChange}
+                onBlur={handleBlur}
+                aria-invalid={Boolean(shown("email"))}
+                aria-describedby={shown("email") ? "email-error" : undefined}
+                className={fieldClass(shown("email"))}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm text-text outline-none transition-colors focus:border-accent"
               />
-            </div>
+            </Field>
             <div className="sm:col-span-2">
-              <label className="mb-1.5 block font-mono text-xs uppercase tracking-wide text-muted">
-                Message
-              </label>
-              <textarea
-                required
-                name="message"
-                value={form.message}
-                onChange={handleChange}
-                rows={5}
-                placeholder="Tell me about your project or role..."
-                className="w-full resize-none rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm text-text outline-none transition-colors focus:border-accent"
-              />
+              <Field id="message" label="Message" error={shown("message")}>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={5}
+                  value={form.message}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  aria-invalid={Boolean(shown("message"))}
+                  aria-describedby={shown("message") ? "message-error" : undefined}
+                  className={`${fieldClass(shown("message"))} resize-y`}
+                  placeholder="Tell me about the role or project"
+                />
+              </Field>
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={status === "sending"}
-            className="btn-primary mt-6 w-full justify-center disabled:opacity-70"
-          >
-            {status === "idle" && (
-              <>
-                <HiOutlinePaperAirplane className="-rotate-45" />
-                Send Message
-              </>
-            )}
-            {status === "sending" && "Sending..."}
-            {status === "sent" && "Message sent ✓"}
-            {status === "error" && "Couldn't send — try again"}
+          {/* Honeypot: hidden from people, bots tend to fill it. */}
+          <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+
+          <button type="submit" disabled={status === "sending"} className="btn-primary mt-6 w-full sm:w-auto">
+            {status === "sending" ? "Sending…" : "Send message"}
           </button>
 
-          {status === "error" && (
-            <p className="mt-3 text-center text-xs text-muted">
-              Something went wrong. You can also email me directly at{" "}
-              <a href={socials.email} className="text-accent underline">
-                {profile.email}
-              </a>
-              .
-            </p>
-          )}
-        </motion.form>
+          <div aria-live="polite" className="mt-4 min-h-5 text-sm">
+            {status === "sent" && <p className="text-accent">Message sent. Thanks, I'll reply soon.</p>}
+            {status === "error" && (
+              <p className="text-red-400">
+                Couldn't send your message. Try again, or email me at{" "}
+                <a href={socials.email} className="underline">
+                  {profile.email}
+                </a>
+                .
+              </p>
+            )}
+          </div>
+        </form>
       </div>
-    </section>
+    </Section>
   );
 }

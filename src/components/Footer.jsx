@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { HiOutlineArrowUp } from "react-icons/hi";
 import { profile } from "../data/portfolioData";
+import ThemeLamp from "./ThemeLamp.jsx";
+import SoundToggle from "./SoundToggle.jsx";
+import InteractiveName from "./InteractiveName.jsx";
 
 /**
  * Footer
@@ -15,7 +18,9 @@ export default function Footer() {
   const lastName = rest.join(" ");
 
   return (
-    <footer className="container-px relative mx-auto max-w-7xl border-t border-border pb-10 pt-16">
+    <footer className="container-px relative mx-auto max-w-7xl border-t border-border pb-10 pt-0">
+      <SoundToggle className="absolute left-6 top-10 h-10 w-10 sm:left-10 lg:left-20" />
+
       <motion.button
         onClick={scrollToTop}
         whileHover={{ y: -3 }}
@@ -25,15 +30,21 @@ export default function Footer() {
         <HiOutlineArrowUp />
       </motion.button>
 
-      <div className="flex flex-col items-center text-center">
+      <ThemeLamp />
+
+      <div className="relative flex flex-col items-center text-center">
         <span className="eyebrow">
           {profile.role}  
         </span>
 
         <h2 className="mt-6 font-display text-[clamp(2.5rem,9vw,6rem)] font-bold uppercase leading-none tracking-tight">
-          <span className="text-text">{firstName}</span>
-          <span className="text-accent"> </span>
-          <span className="text-muted">{lastName}</span>
+          <InteractiveName
+            label={profile.name}
+            parts={[
+              { text: firstName, className: "text-text" },
+              { text: lastName, className: "text-muted" },
+            ]}
+          />
         </h2>
 
         <div className="mt-10 h-px w-full max-w-md bg-gradient-to-r from-transparent via-border to-transparent" />

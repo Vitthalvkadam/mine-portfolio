@@ -58,7 +58,7 @@ export default function BlogPostPage() {
           {post.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-border px-3 py-1 font-mono text-[11px] text-accent-2"
+              className="tag"
             >
               {tag}
             </span>

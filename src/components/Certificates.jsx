@@ -1,121 +1,99 @@
-
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineAcademicCap } from "react-icons/hi2";
 import { HiOutlineX } from "react-icons/hi";
+import Section from "./Section.jsx";
 import { certificates } from "../data/portfolioData";
+import { speakCertificateLine } from "../utils/sfx.js";
 
 export default function Certificates() {
-  const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const closeRef = useRef(null);
+  const openerRef = useRef(null);
+
+  const close = () => {
+    setSelected(null);
+    openerRef.current?.focus(); // return focus to the card that opened the dialog
+  };
+
+  useEffect(() => {
+    if (!selected) return undefined;
+    closeRef.current?.focus();
+    const onKey = (e) => e.key === "Escape" && close();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected]);
 
   return (
-    <section
-      id="certificates"
-      className="container-px mx-auto max-w-7xl py-28"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-        className="mx-auto max-w-2xl text-center"
-      >
-        <span className="eyebrow">Certificates</span>
-
-        <h2 className="section-heading mt-3">
-          Proof of <span className="gradient-text">practice</span>
-        </h2>
-      </motion.div>
-
-      <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {certificates.map((cert, i) => (
-          <motion.div
-            key={cert.title}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
-            whileHover={{ y: -6, scale: 1.015 }}
-            onClick={() => setSelectedCertificate(cert)}
-            className="glass relative cursor-pointer overflow-hidden rounded-2xl p-6 transition-shadow duration-300 hover:shadow-[0_0_40px_-15px_rgba(255,255,255,0.15)]"
-          >
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-accent/10 blur-2xl" />
-
-            <HiOutlineAcademicCap className="text-3xl text-accent" />
-
-            <h3 className="mt-4 font-display text-base font-semibold text-text">
-              {cert.title}
-            </h3>
-
-            <p className="mt-1 text-sm text-muted">
-              {cert.issuer}
-            </p>
-
-            <span className="mt-4 inline-block font-mono text-xs uppercase tracking-wide text-accent-2">
-              {cert.date}
-            </span>
-
-            <p className="mt-5 text-xs text-muted opacity-70">
-              Click to verify →
-            </p>
-          </motion.div>
+    <Section id="certificates" title="Certificates" description="Courses and programmes I've completed.">
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {certificates.map((cert) => (
+          <li key={cert.title}>
+            <button
+              type="button"
+              onClick={(e) => {
+                openerRef.current = e.currentTarget;
+                setSelected(cert);
+                speakCertificateLine();
+              }}
+              className="card card-hover flex h-full w-full flex-col p-6 text-left"
+            >
+              <HiOutlineAcademicCap className="text-2xl text-accent" aria-hidden="true" />
+              <span className="mt-4 font-display text-base font-semibold text-text">{cert.title}</span>
+              <span className="mt-1 text-sm text-muted">{cert.issuer}</span>
+              <span className="mt-4 flex w-full items-center justify-between font-mono text-xs text-accent-2">
+                {cert.date}
+                <span className="text-muted">Verify</span>
+              </span>
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
 
-      {/* Verification Modal */}
       <AnimatePresence>
-        {selectedCertificate && (
+        {selected && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSelectedCertificate(null)}
+            onClick={close}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.25 }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cert-dialog-title"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 12 }}
+              transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass relative w-full max-w-md rounded-2xl p-8 text-center"
+              className="card relative w-full max-w-md p-8 text-center"
             >
-              {/* Close Button */}
               <button
-                onClick={() => setSelectedCertificate(null)}
-                className="absolute right-4 top-4 rounded-full p-2 text-muted transition hover:bg-white/10 hover:text-text"
+                ref={closeRef}
+                type="button"
+                onClick={close}
+                className="absolute right-3 top-3 rounded-full p-2 text-muted transition-colors hover:text-text"
                 aria-label="Close"
               >
                 <HiOutlineX className="text-xl" />
               </button>
 
-              <HiOutlineAcademicCap className="mx-auto text-5xl text-accent" />
-
-              <h3 className="mt-5 font-display text-xl font-semibold text-text">
-                Sounds fake? 
+              <HiOutlineAcademicCap className="mx-auto text-4xl text-accent" aria-hidden="true" />
+              <h3 id="cert-dialog-title" className="mt-4 font-display text-xl font-semibold text-text">
+                Sounds fake?
               </h3>
+              <p className="mt-2 text-sm text-muted">Unfortunately, it’s real.</p>
+              <p className="mt-1 text-sm text-muted">{selected.title}</p>
 
-              <p className="mt-2 text-sm leading-6 text-muted">
-                Unfortunately, it’s real.
-              </p>
-
-              <button
-                onClick={() => {
-                  window.open(
-                    selectedCertificate.image,
-                    "_blank",
-                    "noopener,noreferrer"
-                  );
-                }}
-                className="mt-7 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-black transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
-              >
-                Certificate
-              </button>
+              <a href={selected.image} target="_blank" rel="noopener noreferrer" className="btn-primary mt-6">
+                Open certificate
+              </a>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </Section>
   );
 }
-

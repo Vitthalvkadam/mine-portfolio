@@ -1,21 +1,25 @@
 import Hero from "../components/Hero";
 import About from "../components/About";
 import Skills from "../components/Skills";
+import Projects from "../components/Projects";
+import CurrentlyBuilding from "../components/CurrentlyBuilding";
+import GitHubSection from "../components/GitHubSection";
 import Certificates from "../components/Certificates";
+import Terminal from "../components/Terminal";
 import Contact from "../components/Contact";
 
-/**
- * Home
- * The landing page. Projects now lives on its own route (/projects),
- * so it isn't rendered here — everything else stays as one scrollable page.
- */
+/** The landing page: one scrollable page. /projects, /blog and /ghost stay separate routes. */
 export default function Home() {
   return (
     <>
       <Hero />
       <About />
       <Skills />
+      <Projects />
+      <CurrentlyBuilding />
+      <GitHubSection />
       <Certificates />
+      <Terminal />
       <Contact />
     </>
   );

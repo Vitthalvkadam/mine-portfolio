@@ -84,3 +84,11 @@ src/
 - Wire the contact form up to a real backend or a service like Formspree /
   EmailJS — it currently simulates a send.
 - Update social links and email in `portfolioData.js`.
+
+## Real audio / horror media (optional, auto-detected)
+
+Drop licensed, human-recorded files into `src/assets/audio/` (`splash.*`, `scream.*`,
+`certificate.*`) and a ghost clip/image into `src/assets/horror/` (`ghost.mp4|webm` or
+`ghost.jpg|png|webp`). They are picked up at build time; see the `README.txt` in each folder.
+Without them, the splash is silent, the certificate click plays a short non-speech blip, and the
+ghost attack uses a built-in SVG face with a synthesised (non-voice) impact sound.

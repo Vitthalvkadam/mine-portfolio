@@ -1,34 +1,33 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
 @theme {
-  /* Dark mode: plain, neutral black — no blue tint. */
-  --color-bg: #000000;
-  --color-surface: #0a0a0a;
-  --color-surface-2: #161616;
-  --color-accent: #e5e5e5;
-  --color-accent-2: #a3a3a3;
-  --color-text: #f5f5f5;
-  --color-muted: #8a8a8a;
-  --color-border: #262626;
+  /* Dark: navy-black base with a single cyan accent. */
+  --color-bg: #060b16;
+  --color-surface: #0b1322;
+  --color-surface-2: #111c30;
+  --color-accent: #22d3ee;
+  --color-accent-2: #67e8f9;
+  --color-text: #e8eef8;
+  --color-muted: #8b9bb4;
+  --color-border: #1c2a42;
 
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-nav: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Light theme overrides — toggled via the `light` class on <html>.
-   Because Tailwind's generated utilities (bg-bg, text-text, etc.) all
-   resolve to var(--color-*), simply re-defining these custom properties
-   here re-themes every component with zero extra classes. */
+   Tailwind utilities (bg-bg, text-text, …) resolve to var(--color-*), so
+   redefining the tokens re-themes every component. */
 html.light {
   --color-bg: #f6f8fc;
   --color-surface: #ffffff;
   --color-surface-2: #eef2f9;
   --color-accent: #0284c7;
-  --color-accent-2: #0891b2;
+  --color-accent-2: #0e7490;
   --color-text: #0f172a;
-  --color-muted: #5b6478;
+  --color-muted: #55607a;
   --color-border: #dde4f0;
 }
 
@@ -39,6 +38,7 @@ html.light {
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
   }
 
   body {
@@ -91,42 +91,425 @@ html.light {
 
 @layer components {
   .container-px {
-    @apply px-6 sm:px-10 lg:px-20;
+    @apply px-5 sm:px-8 lg:px-12;
   }
 
   .section-heading {
     font-family: var(--font-display);
-    @apply text-3xl sm:text-4xl font-semibold tracking-tight text-text;
+    @apply text-3xl font-semibold tracking-tight text-text sm:text-4xl;
   }
 
+  /* Small mono label (kept for existing pages) — sentence case, no tracking. */
   .eyebrow {
     font-family: var(--font-mono);
-    @apply text-xs uppercase tracking-[0.3em] text-accent;
+    @apply text-sm text-accent;
   }
 
   .glass {
-    background: color-mix(in oklab, var(--color-surface) 70%, transparent);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: color-mix(in oklab, var(--color-surface) 82%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--color-border);
   }
 
+  .card {
+    @apply rounded-xl border border-border bg-surface transition-colors duration-200;
+  }
+
+  a.card:hover,
+  button.card:hover,
+  .card-hover:hover {
+    border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-border));
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    @apply rounded-md border border-border bg-surface-2 px-2.5 py-1 text-[11px] leading-none text-accent-2;
+  }
+
+  /* Solid accent now — kept as a class name so older pages pick it up. */
   .gradient-text {
-    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--color-accent);
   }
 
   .btn-primary {
-    font-family: var(--font-mono);
-    @apply relative inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-bg transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98];
-    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
-    box-shadow: 0 0 30px -8px var(--color-accent);
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-bg transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-ghost {
-    font-family: var(--font-mono);
-    @apply inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-medium text-text transition-all duration-300 hover:border-accent hover:text-accent;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-text transition-colors duration-200 hover:border-accent hover:text-accent;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme lamp: brief global colour cross-fade while the theme flips    */
+/* ------------------------------------------------------------------ */
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease,
+    fill 0.45s ease, stroke 0.45s ease !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Crazy Mode                                                          */
+/* ------------------------------------------------------------------ */
+html.crazy body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(120, 0, 0, 0.28) 100%);
+  animation: crazy-flicker 7s linear infinite;
+}
+
+@keyframes crazy-flicker {
+  0%, 100% { opacity: 1; }
+  90% { opacity: 1; }
+  91% { opacity: 0.45; }
+  92% { opacity: 1; }
+  95% { opacity: 0.6; }
+  96% { opacity: 1; }
+}
+
+.crazy-bob {
+  transform-origin: 50% 100%;
+  animation: crazy-bob 2.6s ease-in-out infinite;
+}
+
+.crazy-bob--wild {
+  animation: crazy-wild 0.8s ease-in-out infinite;
+}
+
+@keyframes crazy-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-6deg); }
+}
+
+@keyframes crazy-wild {
+  0%, 100% { transform: translateY(0) rotate(-9deg); }
+  25% { transform: translateY(-3px) rotate(7deg); }
+  50% { transform: translateY(0) rotate(-5deg); }
+  75% { transform: translateY(-2px) rotate(9deg); }
+}
+
+.ghost-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ghost-blink 4.5s infinite;
+}
+
+@keyframes ghost-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Crazy Mode — navbar button                                          */
+/* ------------------------------------------------------------------ */
+.crazy-word {
+  font-family: "Creepster", "Sora", cursive;
+  letter-spacing: 0.09em;
+  white-space: nowrap;
+}
+
+.crazy-btn:hover .crazy-bob {
+  animation: crazy-wild 0.8s ease-in-out infinite;
+}
+
+.crazy-btn:hover .crazy-word {
+  text-shadow: 2px 0 rgba(255, 0, 60, 0.9), -2px 0 rgba(0, 220, 255, 0.8);
+  animation: crazy-text-jitter 0.4s steps(1) infinite;
+}
+
+.crazy-btn--on {
+  border-color: rgb(239 68 68 / 0.8);
+  color: #ff4a4a;
+  box-shadow: 0 0 22px -3px rgba(220, 20, 20, 0.85), inset 0 0 12px rgba(220, 20, 20, 0.25);
+  animation: crazy-btn-pulse 1.8s ease-in-out infinite;
+}
+
+.crazy-btn--on .crazy-word {
+  text-shadow: 0 0 8px rgba(255, 40, 40, 0.9);
+}
+
+@keyframes crazy-btn-pulse {
+  0%, 100% { box-shadow: 0 0 18px -3px rgba(220, 20, 20, 0.7), inset 0 0 10px rgba(220, 20, 20, 0.2); }
+  50% { box-shadow: 0 0 30px -2px rgba(255, 30, 30, 0.95), inset 0 0 16px rgba(220, 20, 20, 0.35); }
+}
+
+@keyframes crazy-text-jitter {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, 0); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Crazy Mode — one global red-horror background                        */
+/* A single fixed layer (see Background.jsx) shows behind every section, */
+/* route and the footer, so scrolling/navigating never changes it. The  */
+/* colour tokens are re-pointed on <html> for contrast; the light/dark  */
+/* theme classes are untouched and return when the mode is switched off.*/
+/* ------------------------------------------------------------------ */
+html.crazy {
+  --color-bg: #050001;
+  --color-surface: #12060a;
+  --color-surface-2: #1d0a0f;
+  --color-accent: #ff5a4d;
+  --color-accent-2: #ff9a8a;
+  --color-text: #f4eae8;
+  --color-muted: #b79a99;
+  --color-border: #3a1216;
+}
+
+.crazy-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -8;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.crazy-bg::before,
+.crazy-bg::after {
+  content: "";
+  position: absolute;
+  inset: -12px;
+}
+
+.crazy-bg::before {
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(150, 10, 10, 0.45), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(80, 0, 110, 0.4), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 100% 60%, rgba(120, 0, 20, 0.3), transparent 70%),
+    radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.8) 100%),
+    linear-gradient(180deg, #060003 0%, #0c0205 50%, #040003 100%);
+  animation: crazy-lights 7s linear infinite;
+}
+
+.crazy-bg::after {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px),
+    radial-gradient(ellipse 30% 25% at 30% 40%, rgba(255, 255, 255, 0.08), transparent 70%),
+    radial-gradient(ellipse 35% 30% at 75% 65%, rgba(190, 190, 255, 0.07), transparent 70%);
+  background-size: 100% 100%, 140% 140%, 140% 140%;
+  mix-blend-mode: screen;
+  animation: crazy-fog 16s ease-in-out infinite alternate;
+}
+
+.crazy-ember {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 9999px;
+  background: #ff3b2a;
+  box-shadow: 0 0 10px 3px rgba(255, 40, 20, 0.55);
+  opacity: 0;
+  animation-name: ember-rise;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+
+html.crazy h1,
+html.crazy h2 {
+  animation: crazy-heading-glitch 6s steps(1) infinite;
+}
+
+@keyframes ember-rise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: 0.85; }
+  100% { opacity: 0; transform: translate(30px, -85vh); }
+}
+
+@keyframes crazy-lights {
+  0%, 86%, 100% { filter: brightness(1); transform: none; }
+  87% { filter: brightness(0.5); }
+  88% { filter: brightness(1.25); }
+  89% { filter: brightness(0.65); }
+  90% { filter: brightness(1); }
+  95% { transform: none; filter: none; }
+  95.5% { transform: translateX(8px) skewX(2deg); filter: hue-rotate(40deg) saturate(1.8); }
+  96% { transform: translateX(-10px); filter: hue-rotate(-30deg) saturate(1.5); }
+  96.5% { transform: none; filter: none; }
+}
+
+@keyframes crazy-fog {
+  from { background-position: 0 0, 0% 0%, 100% 100%; }
+  to { background-position: 0 0, 60% 30%, 40% 70%; }
+}
+
+@keyframes crazy-heading-glitch {
+  0%, 93%, 100% { transform: none; }
+  94% { transform: translate(-3px, 1px) skewX(-3deg); }
+  95% { transform: translate(3px, -1px) skewX(3deg); }
+  96% { transform: translate(-1px, 0); }
+  97% { transform: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Crazy Mode — full-screen ghost attack (3s sequence)                  */
+/* 0-.4s lights die · .4-1.05s something creeps closer · 1.05s LUNGE    */
+/* + scream + flash · hold with glitch/shake · fade out at ~2.6-3s.     */
+/* Keep these timings in sync with DURATION / LUNGE_AT in GhostOverlay. */
+/* ------------------------------------------------------------------ */
+.ga-dark { animation: ga-dark var(--ga-dur, 3s) linear both; }
+.ga-ghost {
+  animation: ga-rush var(--ga-dur, 3s) linear both;
+  transform-origin: var(--ox, 50%) var(--oy, 50%);
+  filter: contrast(1.25) brightness(0.92) blur(var(--ga-blur, 0px));
+}
+.ga-ghost--media {
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 55%, transparent 80%);
+  mask-image: radial-gradient(ellipse at center, #000 55%, transparent 80%);
+}
+.ga-shake { animation: ga-shake 0.18s steps(1) calc(var(--ga-dur, 3s) * 0.41) infinite backwards; }
+.ga-blood {
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(150, 0, 0, 0.8) 100%);
+  animation: ga-blood var(--ga-dur, 3s) linear both;
+}
+.ga-noise {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0 2px, transparent 2px 5px);
+  mix-blend-mode: overlay;
+  animation: ga-noise var(--ga-dur, 3s) linear both, ga-noise-shift 0.3s steps(4) infinite;
+}
+.ga-flash { background: #fff; animation: ga-flash var(--ga-dur, 3s) linear both; }
+
+/* Sweep: the ghost sprints across the screen */
+.ga-root--sweep .ga-dark { animation: ga-dark-sweep var(--ga-dur) linear both; }
+.ga-root--sweep .ga-ghost {
+  --ga-blur: 3px;
+  animation: ga-sweep var(--ga-dur) cubic-bezier(0.45, 0, 0.55, 1) both;
+}
+.ga-root--sweep .ga-shake { animation-delay: 0s; }
+.ga-root--sweep .ga-blood,
+.ga-root--sweep .ga-flash { display: none; }
+.ga-root--sweep .ga-noise { animation: ga-noise-sweep var(--ga-dur) linear both, ga-noise-shift 0.3s steps(4) infinite; }
+
+@keyframes ga-dark-sweep { 0% { opacity: 0; } 12%, 85% { opacity: 0.82; } 100% { opacity: 0; } }
+@keyframes ga-noise-sweep { 0% { opacity: 0; } 20%, 80% { opacity: 0.35; } 100% { opacity: 0; } }
+@keyframes ga-sweep {
+  from { opacity: 1; transform: translate(calc(var(--dir, 1) * -95vw), var(--y, 0)) scale(var(--s, 1.4)) scaleX(var(--dir, 1)); }
+  to { opacity: 1; transform: translate(calc(var(--dir, 1) * 95vw), var(--y, 0)) scale(var(--s, 1.4)) scaleX(var(--dir, 1)); }
+}
+
+/* Reduced motion: a still, dim, non-flashing appearance (no movement or strobing) */
+.ga-root--reduced .ga-dark { animation: none; opacity: 0.88; }
+.ga-root--reduced .ga-ghost { animation: none; opacity: 0.8; transform: scale(0.85); }
+.ga-root--reduced .ga-shake,
+.ga-root--reduced .ga-blood,
+.ga-root--reduced .ga-noise,
+.ga-root--reduced .ga-flash { display: none; }
+
+@keyframes ga-dark {
+  0% { opacity: 0; }
+  4% { opacity: 0.95; }
+  7% { opacity: 0.55; }
+  9%, 88% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes ga-rush {
+  0%, 12% { opacity: 0; transform: scale(0.08); }
+  20% { opacity: 0.5; transform: scale(0.16); }
+  33% { opacity: 0.8; transform: scale(0.26); animation-timing-function: cubic-bezier(0.7, 0, 1, 0.35); }
+  41% { opacity: 1; transform: scale(1.9); }
+  60% { opacity: 1; transform: scale(1.55); }
+  86% { opacity: 1; transform: scale(1.8); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+@keyframes ga-shake {
+  0% { transform: translate(0, 0) rotate(0); filter: none; }
+  25% { transform: translate(-14px, 8px) rotate(-1.5deg); filter: drop-shadow(8px 0 0 rgba(255, 0, 0, 0.6)) drop-shadow(-8px 0 0 rgba(0, 255, 255, 0.5)); }
+  50% { transform: translate(12px, -10px) rotate(1.2deg); filter: drop-shadow(-6px 0 0 rgba(255, 0, 0, 0.6)) drop-shadow(6px 0 0 rgba(0, 255, 255, 0.5)); }
+  75% { transform: translate(-8px, -12px) rotate(-0.8deg); filter: none; }
+}
+
+@keyframes ga-blood {
+  0%, 34% { opacity: 0; }
+  41% { opacity: 0.95; }
+  70% { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+
+@keyframes ga-noise {
+  0%, 38% { opacity: 0; }
+  41% { opacity: 0.55; }
+  80% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+
+@keyframes ga-noise-shift {
+  0% { background-position: 0 0, 0 0; }
+  25% { background-position: -40px 25px, 0 0; }
+  50% { background-position: 30px -35px, 0 0; }
+  75% { background-position: -20px -15px, 0 0; }
+}
+
+@keyframes ga-flash {
+  0%, 39.5% { opacity: 0; }
+  41% { opacity: 0.95; }
+  44% { opacity: 0; }
+  52% { opacity: 0.3; background: #a00; }
+  56%, 100% { opacity: 0; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Splash screen                                                       */
+/* ------------------------------------------------------------------ */
+.splash-vignette {
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.splash-glow {
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.28), transparent 75%);
+  filter: blur(22px);
+  opacity: 0.7;
+}
+
+.splash-glow--pulse {
+  animation: splash-glow 2.2s ease-in-out infinite;
+}
+
+.splash-sweep {
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: splash-sweep 1.6s ease-in-out 1s forwards;
+}
+
+.splash-particle {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.45);
+  opacity: 0;
+  animation-name: splash-rise;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+
+@keyframes splash-glow {
+  0%, 100% { opacity: 0.45; transform: scale(0.97); }
+  50% { opacity: 0.85; transform: scale(1.04); }
+}
+
+@keyframes splash-sweep {
+  to { transform: translateX(120%); }
+}
+
+@keyframes splash-rise {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  15% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-75vh) scale(0.4); }
+}
+
+
+/* Ghost playground: gentle idle hover */
+.ghost-idle { animation: ghost-idle 3.2s ease-in-out infinite; }
+@keyframes ghost-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }

@@ -1,81 +1,40 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
-import { profile, stats, timeline } from "../data/portfolioData";
-
-function Counter({ value, suffix }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const motionVal = useMotionValue(0);
-  const spring = useSpring(motionVal, { duration: 1.6, bounce: 0 });
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    if (inView) motionVal.set(value);
-  }, [inView, value, motionVal]);
-
-  useEffect(() => {
-    const unsub = spring.on("change", (v) => setDisplay(Math.round(v)));
-    return unsub;
-  }, [spring]);
-
-  return (
-    <span ref={ref} className="font-display text-4xl font-semibold text-text sm:text-5xl">
-      {display}
-      <span className="text-accent">{suffix}</span>
-    </span>
-  );
-}
+import Section from "./Section.jsx";
+import { profile, timeline } from "../data/portfolioData";
 
 export default function About() {
   return (
-    <section id="about" className="container-px mx-auto max-w-7xl py-28">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-        className="mx-auto max-w-2xl text-center"
-      >
-        <span className="eyebrow">About</span>
-        <h2 className="section-heading mt-3">
-          The engineer behind the <span className="gradient-text">code</span>
-        </h2>
-        <p className="mt-5 leading-relaxed text-muted">{profile.about}</p>
-      </motion.div>
+    <Section id="about" title="About" description="A short introduction and how I got here.">
+      <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <p className="max-w-prose text-base leading-relaxed text-muted">{profile.about}</p>
 
-    
+          <dl className="mt-8 divide-y divide-border border-y border-border">
+            {profile.facts.map((f) => (
+              <div key={f.label} className="grid gap-1 py-3 sm:grid-cols-[7rem_1fr] sm:gap-4">
+                <dt className="text-sm text-muted">{f.label}</dt>
+                <dd className="text-sm text-text">{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
 
-      {/* timeline */}
-      <div className="mx-auto mt-24 max-w-2xl">
-        <motion.h3
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mb-10 text-center font-mono text-sm uppercase tracking-[0.25em] text-muted"
-        >
-          Learning Path
-        </motion.h3>
-
-        <ol className="relative border-l border-border pl-8">
-          {timeline.map((item, i) => (
-            <motion.li
-              key={item.year}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.12 }}
-              className="mb-10 last:mb-0"
-            >
-              <span className="absolute -left-[7px] mt-1.5 h-3 w-3 rounded-full bg-accent shadow-[0_0_12px_2px_rgba(255,255,255,0.35)]" />
-              <span className="font-mono text-xs uppercase tracking-wide text-accent-2">
-                {item.year}
-              </span>
-              <h4 className="mt-1 font-display text-lg font-medium text-text">{item.title}</h4>
-              <p className="mt-1 text-sm leading-relaxed text-muted">{item.description}</p>
-            </motion.li>
-          ))}
-        </ol>
+        <div>
+          <h3 className="font-display text-lg font-semibold text-text">Developer journey</h3>
+          <ol className="mt-6 space-y-8 border-l border-border pl-6">
+            {timeline.map((entry) => (
+              <li key={entry.year} className="relative">
+                <span
+                  className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-accent bg-bg"
+                  aria-hidden="true"
+                />
+                <p className="font-mono text-xs text-accent-2">{entry.year}</p>
+                <h4 className="mt-1 font-display text-base font-medium text-text">{entry.title}</h4>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{entry.description}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
-    </section>
+    </Section>
   );
 }

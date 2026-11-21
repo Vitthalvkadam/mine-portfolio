@@ -4,11 +4,9 @@ const ThemeContext = createContext(null);
 
 function getInitialTheme() {
   if (typeof window === "undefined") return "dark";
+  // Dark is the default look; light only applies when the visitor chose it with the lamp.
   const stored = window.localStorage.getItem("theme");
-  if (stored === "light" || stored === "dark") return stored;
-  // Fall back to the visitor's OS preference, default to dark otherwise.
-  const prefersLight = window.matchMedia?.("(prefers-color-scheme: light)").matches;
-  return prefersLight ? "light" : "dark";
+  return stored === "light" ? "light" : "dark";
 }
 
 export function ThemeProvider({ children }) {

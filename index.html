@@ -4,21 +4,29 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#060b16" />
     <title>Vitthal Kadam | Java Full Stack Developer</title>
     <meta
       name="description"
       content="Portfolio of Vitthal Kadam — Java Full Stack Developer building with Spring Boot, React and MySQL."
     />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Vitthal Kadam | Java Full Stack Developer" />
+    <meta
+      property="og:description"
+      content="Java Full Stack Developer building with Spring Boot, React and MySQL."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Creepster&display=swap"
+    />
     <script>
       (function () {
         try {
           var stored = localStorage.getItem("theme");
-          var theme =
-            stored === "light" || stored === "dark"
-              ? stored
-              : window.matchMedia("(prefers-color-scheme: light)").matches
-              ? "light"
-              : "dark";
+          var theme = stored === "light" ? "light" : "dark";
           document.documentElement.classList.add(theme);
           document.documentElement.style.colorScheme = theme;
         } catch (e) {}
@@ -27,6 +35,7 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>This portfolio needs JavaScript enabled to run.</noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

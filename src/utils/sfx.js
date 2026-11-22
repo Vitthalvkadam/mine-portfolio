@@ -6,9 +6,8 @@
  * non-speech fallbacks / ambience. No text-to-speech is used.
  *
  * Autoplay rules: the AudioContext is only created from a real user gesture
- * (see `armOnFirstGesture` / the gesture-driven play functions). Timer-driven
- * sounds (the ghost) never create or force-resume a context, so they stay
- * silent until the visitor has interacted with the page at least once.
+ * (see `armOnFirstGesture` / the gesture-driven play functions), so nothing is
+ * audible until the visitor has interacted with the page at least once.
  */
 
 import { audioAssets } from "./assets.js";
@@ -74,7 +73,7 @@ export function armOnFirstGesture() {
 
 /* ---- real recordings (HTMLAudio) ---- */
 const assetEls = {};
-const VOLUME = { splash: 0.6, scream: 0.85, certificate: 0.9, runner: 0.8 };
+const VOLUME = { certificate: 0.9 };
 
 export const hasAsset = (name) => Boolean(audioAssets[name]);
 
@@ -250,30 +249,6 @@ export function playDarkStinger() {
     tone(c, { type: "sine", f0: 1320, f1: 990, t: 0.25, dur: 0.9, peak: 0.012, attack: 0.3 });
     whoosh(c, { dur: 1.5, peak: 0.05, f0: 520, f1: 110 });
   });
-}
-
-/** Music-box style minor chime when Crazy Mode is switched on (user-initiated). */
-export function playCrazyOn() {
-  unlock();
-  run((c) => {
-    [659, 622, 523, 311].forEach((f, i) => {
-      tone(c, { f0: f, t: i * 0.17, dur: 0.9, peak: 0.07, attack: 0.01 });
-      tone(c, { f0: f * 2.76, t: i * 0.17, dur: 0.5, peak: 0.012, attack: 0.01 });
-    });
-    whoosh(c, { t: 0.1, dur: 1, peak: 0.025, f0: 900, f1: 200 });
-  });
-}
-
-/** Sudden scare: only the real recording (src/assets/audio/scream.mp3). No synthesised fallback. */
-export function playGhostScream() {
-  if (muted) return;
-  playAsset("scream");
-}
-
-/** Fast background pass: only the real recording (src/assets/audio/runner.mp3). */
-export function playGhostPass() {
-  if (muted) return;
-  playAsset("runner");
 }
 
 /** Cartoon "boing" — fallback when speech synthesis is unavailable. */

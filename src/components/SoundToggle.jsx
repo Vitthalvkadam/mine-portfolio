@@ -1,9 +1,9 @@
 import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
-import { useCrazyMode } from "../context/CrazyModeContext.jsx";
+import { useSound } from "../context/SoundContext.jsx";
 
-/** Mute / unmute every portfolio sound (dark-mode sting, ghost, certificate voice). */
+/** Mute / unmute every portfolio sound (dark-mode sting, certificate voice). */
 export default function SoundToggle({ className = "" }) {
-  const { muted, toggleMute } = useCrazyMode();
+  const { muted, toggleMute } = useSound();
   return (
     <button
       type="button"

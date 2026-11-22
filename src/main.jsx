@@ -4,16 +4,16 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
-import { CrazyModeProvider } from "./context/CrazyModeContext.jsx";
+import { SoundProvider } from "./context/SoundContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider>
-      <CrazyModeProvider>
+      <SoundProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </CrazyModeProvider>
+      </SoundProvider>
     </ThemeProvider>
   </StrictMode>
 );

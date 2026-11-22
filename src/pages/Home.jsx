@@ -8,7 +8,7 @@ import Certificates from "../components/Certificates";
 import Terminal from "../components/Terminal";
 import Contact from "../components/Contact";
 
-/** The landing page: one scrollable page. /projects, /blog and /ghost stay separate routes. */
+/** The landing page: one scrollable page. /projects and /blog stay separate routes. */
 export default function Home() {
   return (
     <>

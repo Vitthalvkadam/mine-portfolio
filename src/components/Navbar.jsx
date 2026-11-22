@@ -4,15 +4,13 @@ import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { navLinks, profile } from "../data/portfolioData";
 import profileImg from "../assets/profile.jpg";
-import CrazyToggle from "./CrazyToggle.jsx";
-import { useCrazyMode } from "../context/CrazyModeContext.jsx";
 
 const linkBase = "relative py-1 text-sm font-medium transition-colors duration-200";
 
 /**
  * Navbar
  * Floating bar aligned to the page's content width. Section links scroll on the home page
- * (or navigate home first); Blog and Ghost are routes. Ghost only shows in Crazy Mode.
+ * (or navigate home first); Blog is a separate route.
  */
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,9 +19,8 @@ export default function Navbar() {
   const pendingHash = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { crazy } = useCrazyMode();
 
-  const links = navLinks.filter((l) => crazy || l.href !== "/ghost");
+  const links = navLinks;
   const isHome = location.pathname === "/";
 
   // Stronger bar background once the page has scrolled.
@@ -169,7 +166,6 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <CrazyToggle />
             <a
               href="/#contact"
               onClick={(e) => {

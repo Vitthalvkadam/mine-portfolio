@@ -186,7 +186,6 @@ export const navLinks = [
   { label: "Projects", href: "/#projects", type: "section" },
   { label: "GitHub", href: "/#github", type: "section" },
   { label: "Blog", href: "/blog", type: "page" },
-  { label: "Ghost", href: "/ghost", type: "page" },
 ];
 
 
